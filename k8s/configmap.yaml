@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ledger-config
+data:
+  DB_URL: "jdbc:postgresql://postgres-service:5432/ledger_db"
+  DB_POOL_SIZE: "10"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"

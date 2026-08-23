@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fintech_postgres
+    environment:
+      POSTGRES_USER: ledger_user
+      POSTGRES_PASSWORD: ledger_password
+      POSTGRES_DB: ledger_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - ./src/main/resources/db/migration/V1__initial_schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ledger_user -d ledger_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: fintech_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fintech_ledger_app
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: "jdbc:postgresql://postgres:5432/ledger_db"
+      DB_USER: "ledger_user"
+      DB_PASSWORD: "ledger_password"
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
