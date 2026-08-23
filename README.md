@@ -359,7 +359,3 @@ Invoke-RestMethod -Uri "http://localhost:8080/accounts/acc-pln-2/balance" -Metho
 ```
 
 ---
-
-## License
-
-Distributed under the MIT License. See `LICENSE` for more information.
